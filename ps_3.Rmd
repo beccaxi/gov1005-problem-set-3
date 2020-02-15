@@ -11,12 +11,36 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(readr)
-
-csv = read_csv("raw-data/xian_data.csv")
-
+library(janitor)
+library(dplyr)
+library(gt)
 ```
 
+```{r data}
 
+read_csv("raw-data/xian_data.csv",
+         skip = 3) %>%
+  clean_names() %>%
+  replace_na(list("undefined")) %>%
+  gt() %>%
+    tab_header(
+      title = "Bread and Circuses: Sports and Public Opinion in China",
+      subtitle = "Dan Chen and Andrew W. MacDonald"
+    ) %>%
+    cols_label(
+      respondent = "Respondent",
+      location = "Location", 
+      news_source = "News Source",
+      eval_gov_overall = "Satisfaction with local government overall",
+      eval_gov_demo = "Satisfaction with local government on the issue of demolition and relocation",
+      eval_gov_traffic = "Satisfaction with local government on the issue of traffic congestion",
+      treatment = "Treatment",
+      control = "Control"
+    ) 
+```
+
+  select(course_title, course_name, instructor_full_name, total) %>% 
+  
 ## Mad Libs
 
 
