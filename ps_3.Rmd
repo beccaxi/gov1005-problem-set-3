@@ -5,7 +5,26 @@ date: "2/19/2020"
 output: html_document
 ---
 
+## Getting Data into R
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readr)
+
+csv = read_csv("raw-data/xian_data.csv")
+
 ```
+
+
+## Mad Libs
+
+
+
+## Data Wrangling
+
+
+
+## Colleagues
+
 
