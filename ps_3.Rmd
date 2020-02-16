@@ -65,7 +65,7 @@ csv %>%
 
 ```{r Mad Libs 1, include=FALSE}
 
-# 
+# I call sum() to aggregate the values of the column "treatment"
 
 r1 <- csv %>%
   summarize(sum(treatment))
