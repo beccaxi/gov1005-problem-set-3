@@ -11,32 +11,36 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # I took a cue from 2/13 class in determining which libraries to load
 
-library(tidyverse)
 library(readr)
 library(janitor)
 library(dplyr)
 library(gt)
+library(tidyverse)
 ```
 
 ```{r data, echo=FALSE}
 
 # As in 2/13 class, I set skip = 3 and moved the descriptive information
-# (authors) for the dataset in those lines into a subtitle for a cleaner look. 
-# I # also looked up and used mutate_at (from
+# (authors) for the dataset in those lines into a subtitle for a cleaner look.
+# While I labeled the columns later on, I first renamed the actual column
+# variables themselves to make for easier handling later. 
+# I also looked up and used mutate_at (from
 # https://stackoverflow.com/questions/3357743/replacing-character-values-with-na-in-a-data-frame)
 # to set all "undefined" values to NA, since replace_na wasn't working for me.
 
-csv <- read_csv("raw-data/xian_data.csv",
-                skip = 3) %>%
+csv <- read_csv(file = "raw-data/xian_data.csv",
+                skip = 3) %>% 
   clean_names() %>%
   mutate_at(vars(eval_gov_overall, eval_gov_demo, eval_gov_traffic), 
             na_if,
-            "undefined") %>%
+            "undefined") 
   
 # I used gt(), as in 2/13 class, for a nice presentation of the data and to
 # label the columns with their actual metric descriptors (which I found from
-# looking at the research on Harvard HOLLIS)
+# looking at the research on Harvard HOLLIS).
+# I 
   
+csv %>%
   gt() %>%
     tab_header(
       title = "Bread and Circuses: Sports and Public Opinion in China",
@@ -51,13 +55,9 @@ csv <- read_csv("raw-data/xian_data.csv",
       demolition and relocation",
       eval_gov_traffic = "Satisfaction with local government on the issue 
       of traffic congestion",
-      treatment = "Treatment",
+      #treatment = "Treatment",
       control = "Control"
     )
-
-# I want to view my csv file in the knitted RMarkdown to HTML file
-
-csv
 ```
 
   
@@ -65,24 +65,49 @@ csv
 
 ```{r Mad Libs 1, include=FALSE}
 
-#
+# 
 
-treatment <- sum(csv$treatment)
+r1 <- csv %>%
+  summarize(sum(treatment))
 ```
 
-1. `r treatment` respondents are in the treatment group.
+1. `r r1` respondents are in the treatment group.
 
 
-2. Among respondents from the treatment group, the government has an average X rating.
+```{r Mad Libs 2, include=FALSE}
+
+# 
 
 
-3. The most common rating for the government’s handling of traffic is X.
+```
+
+2. Among respondents from the treatment group, the government has an average `r ` rating.
 
 
-4. X respondents have given the government a 10 rating overall or on demolitions or on traffic.
+```{r Mad Libs 3, include=FALSE}
+
+# 
+
+```
+
+3. The most common rating for the government’s handling of traffic is `r `.
 
 
-5. But only X gave the government a 10 rating overall and on demolitions and on traffic.
+```{r Mad Libs 4, include=FALSE}
+
+# 
+```
+
+4. `r ` respondents have given the government a 10 rating overall or on demolitions or on traffic.
+
+
+```{r Mad Libs 5, include=FALSE}
+
+# 
+
+```
+
+5. But only `r ` gave the government a 10 rating overall and on demolitions and on traffic.
 
 
 The variable ‘news_source’ asks respondents to list which news sources they get their news from. Some respondents answered more than one option, so their answer lists a number of letters together. A means “Television”, B means “Newspapers”, C means “Radio”, etc
