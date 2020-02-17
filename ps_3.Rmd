@@ -65,7 +65,9 @@ csv %>%
 
 ```{r Mad Libs 1, include=FALSE}
 
-# I call sum() to aggregate the values of the column "treatment"
+# I call sum() to aggregate the values of the column "treatment", which 
+# returns the number of respondents in the Treatment group since each such 
+# respondent corresponds to a value of 1
 
 r1 <- csv %>%
   summarize(sum(treatment))
@@ -76,26 +78,33 @@ r1 <- csv %>%
 
 ```{r Mad Libs 2, include=FALSE}
 
-# 
+# I call mean() to find the average (overall) government rating, filtering for
+# responses from the treatment group only
 
-
+r2 <- csv %>%
+  filter(treatment == 1) %>% 
+  summarize(mean = mean(eval_gov_overall, na.rm=TRUE))
 ```
 
-2. Among respondents from the treatment group, the government has an average `r ` rating.
+2. Among respondents from the treatment group, the government has an average `r r2` rating.
 
 
 ```{r Mad Libs 3, include=FALSE}
 
-# 
+# I call mode() to find the most common value within the traffic evaluation
+# column
 
+r3 <- csv %>%
+  summarize(mode(eval_gov_traffic))
 ```
 
-3. The most common rating for the government’s handling of traffic is `r `.
+3. The most common rating for the government’s handling of traffic is `r r3`.
 
 
 ```{r Mad Libs 4, include=FALSE}
 
 # 
+
 ```
 
 4. `r ` respondents have given the government a 10 rating overall or on demolitions or on traffic.
