@@ -234,7 +234,7 @@ tidy %>%
 
 ### 2.
 
-```{r data 2, echo=FALSE, message=FALSE, warning=FALSE}
+```{r data 2, echo=FALSE, message=FALSE}
 
 # Let's re-read the file in to start on a clean slate, assigning it to
 # "outcomes" now
@@ -271,14 +271,14 @@ outcomes %>%
   cols_align(align = c("center"), columns = TRUE) %>% 
   tab_footnote(
     footnote = "Treatment is a 2 minute video about Chinese sports performance",
-    locations = cells_title()
+    locations = cells_title("title")
   )
 ```
 
 
 ### 3.
 
-```{r data 3, echo=FALSE, message=FALSE, warning=FALSE}
+```{r data 3, echo=FALSE, message=FALSE}
 
 # inner_join demographics to demographics?
 
@@ -286,12 +286,12 @@ load("r-data/demographics.Rdata")
 
 #
 
-topfive <- csv %>% 
+joined <- csv %>% 
   full_join(demographics, by = "respondent")
 
 #
   
-topfive %>% 
+joined %>% 
   filter(treatment == 1) %>% 
   arrange(desc(eval_gov_traffic)) %>%
   select(respondent, eval_gov_traffic, age, gender) %>% 
@@ -309,47 +309,59 @@ topfive %>%
     ) %>% 
     tab_footnote(
       footnote = "Evaluation on Scale from 1 to 10",
-      locations = cells_title()
+      locations = cells_title("title")
     )
 ```
 
 
 ### 4.
 
-```{r data 4}
+```{r data 4, echo=FALSE, message=FALSE}
 
+#
 
+avg_evaluation_treated <- joined %>% 
+  filter(treatment == 1) %>% 
+  summarize(mean(eval_gov_overall))
+
+#
+
+joined %>% 
+  summarize(avg = mean(as.numeric(eval_gov_overall), na.rm = TRUE))
+
+joined %>% 
+  ggplot(aes(x = education, y = avg), 
+         fill = treatment) +
+    geom_point()
 
 ```
 
 
 ### 5.
 
+```{r data 5, echo=FALSE, message=FALSE}
 
+#
+
+
+
+```
 
 
 ## Colleagues
 
 
-Lara Teich
+* Lara Teich
 
+* Ishan Bhaat
 
-Ishan Bhaat
+* Grace Pan
 
+* Stephanie Cheng
 
-Jack
+* Rachel Phan
 
-
-Thomas
-
-
-Grace Pan
-
-
-Stephanie
-
-
-Rachel Phan
+* Sophie Webster
 
 
 
