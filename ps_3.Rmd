@@ -177,7 +177,7 @@ following two locations end with “square”: `r r7`, `r r8`.
 
 ### 1. 
 
-```{r data 2}
+```{r data 1, echo=FALSE}
 
 library(tidyr)
 
@@ -213,21 +213,20 @@ untidy %>%
 #
 
 tidy <- untidy %>% 
+  rename(
+    Overall = eval_gov_overall,
+    Traffic = eval_gov_traffic,
+    Demo = eval_gov_demo
+  ) %>% 
   pivot_longer(
     names_to = "Type of Evaluation",
     values_to = "Performance Rating",
-    cols = c(eval_gov_overall, eval_gov_traffic, eval_gov_demo)
+    cols = c(Overall, Traffic, Demo)
   )
 
 tidy %>% 
   gt() %>% 
-    tab_spanner(label = "Tidy Data",
-                columns = vars(
-                  respondent, 
-                  "Type of Evaluation", 
-                  "Performance Rating"
-                )
-    ) %>% 
+    tab_header(title = "Tidy Data") %>% 
     cols_label(respondent = "Respondent Number")
     
 ```
@@ -235,17 +234,85 @@ tidy %>%
 
 ### 2.
 
+```{r data 2, echo=FALSE}
 
+# Let's re-read the file in to start on a clean slate, assigning it to
+# "outcomes" now
+
+outcomes <- read_csv(file = "raw-data/xian_data.csv",
+                skip = 3,
+                na = c("", "undefined")) %>% 
+  clean_names() %>% 
+  slice(1:10)
+
+# This is to change the treatment and control columns into 
+  
+outcomes %>% 
+  mutate(
+    under_control = ifelse(treatment == 0, eval_gov_overall, "?"),
+    under_treatment = ifelse(treatment == 1, eval_gov_overall, "?")
+  ) %>%
+  select(respondent, treatment, control, under_control, under_treatment) %>% 
+  gt() %>%
+    tab_header(title = "Potential Outcomes") %>%
+    tab_spanner(label = "Potential Outcomes",
+                columns = vars(
+                  under_control,
+                  under_treatment
+                )
+    ) %>% 
+    cols_label(
+      respondent = "Respondent",
+      treatment = "Treatment",
+      control = "Control",
+      under_treatment = "Under Treatment",
+      under_control = "Under Control"
+    ) %>% 
+  cols_align(align = c("center"), columns = TRUE) %>% 
+  tab_footnote(
+    footnote = "Treatment is a 2 minute video about Chinese sports performance",
+    locations = cells_title())
+```
 
 
 ### 3.
 
+```{r data 3, include=FALSE}
+
+# inner_join demographics to demographics?
+
+
+```
+
 
 ### 4.
+
+```{r data 4}
+
+
+
+```
+
+
+### 5.
 
 
 
 
 ## Colleagues
+
+
+Lara Teich
+
+
+Ishan Bhaat
+
+
+Jack
+
+
+Thomas
+
+
 
 
