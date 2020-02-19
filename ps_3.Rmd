@@ -177,7 +177,7 @@ following two locations end with “square”: `r r7`, `r r8`.
 
 ### 1. 
 
-```{r data 1, echo=FALSE}
+```{r data 1, echo=FALSE, message=FALSE, warning=FALSE}
 
 library(tidyr)
 
@@ -234,7 +234,7 @@ tidy %>%
 
 ### 2.
 
-```{r data 2, echo=FALSE}
+```{r data 2, echo=FALSE, message=FALSE, warning=FALSE}
 
 # Let's re-read the file in to start on a clean slate, assigning it to
 # "outcomes" now
@@ -271,17 +271,46 @@ outcomes %>%
   cols_align(align = c("center"), columns = TRUE) %>% 
   tab_footnote(
     footnote = "Treatment is a 2 minute video about Chinese sports performance",
-    locations = cells_title())
+    locations = cells_title()
+  )
 ```
 
 
 ### 3.
 
-```{r data 3, include=FALSE}
+```{r data 3, echo=FALSE, message=FALSE, warning=FALSE}
 
 # inner_join demographics to demographics?
 
+load("r-data/demographics.Rdata")
 
+#
+
+topfive <- csv %>% 
+  full_join(demographics, by = "respondent")
+
+#
+  
+topfive %>% 
+  filter(treatment == 1) %>% 
+  arrange(desc(eval_gov_traffic)) %>%
+  select(respondent, eval_gov_traffic, age, gender) %>% 
+  slice(1:5) %>% 
+  gt() %>% 
+    tab_header(
+      title = "Highest Evaluators of Government Performance on Traffic:",
+      subtitle = "Among Treated Individuals"
+    ) %>% 
+    cols_label(
+      respondent = "Respondent",
+      eval_gov_traffic = "Evaluate Government Performance",
+      age = "Age",
+      gender = "Gender"
+    ) %>% 
+    tab_footnote(
+      footnote = "Evaluation on Scale from 1 to 10",
+      locations = cells_title()
+    )
 ```
 
 
@@ -313,6 +342,14 @@ Jack
 
 Thomas
 
+
+Grace Pan
+
+
+Stephanie
+
+
+Rachel Phan
 
 
 
