@@ -320,18 +320,14 @@ joined %>%
 
 #
 
-avg_evaluation_treated <- joined %>% 
-  filter(treatment == 1) %>% 
-  summarize(mean(eval_gov_overall))
+plot <- joined %>% 
+  select(respondent, education, treatment, control, eval_gov_overall) %>% 
+  group_by(education, treatment, control) %>% 
+  summarize(avg = mean(as.numeric(eval_gov_overall), na.rm = TRUE)) %>% 
+  na.omit()
 
-#
-
-joined %>% 
-  summarize(avg = mean(as.numeric(eval_gov_overall), na.rm = TRUE))
-
-joined %>% 
-  ggplot(aes(x = education, y = avg), 
-         fill = treatment) +
+plot %>% 
+  ggplot(aes(x = education, y = avg), fill = treatment) +
     geom_point()
 
 ```
