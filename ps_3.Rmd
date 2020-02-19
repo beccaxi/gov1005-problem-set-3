@@ -18,27 +18,21 @@ library(gt)
 library(tidyverse)
 ```
 
-```{r data, echo=FALSE}
+```{r data, include=FALSE}
 
 # As in 2/13 class, I set skip = 3 and moved the descriptive information
-# (authors) for the dataset in those lines into a subtitle for a cleaner look.
-# While I labeled the columns later on, I first renamed the actual column
-# variables themselves to make for easier handling later. 
-# I also looked up and used mutate_at (from
-# https://stackoverflow.com/questions/3357743/replacing-character-values-with-na-in-a-data-frame)
-# to set all "undefined" values to NA, since replace_na wasn't working for me.
+# (authors) for the dataset in those lines into a subtitle for a cleaner look. 
+# I used the argument na within read_csv() to replace all missing and undefined
+# values with NA before using clean_names() from the janitor library.
 
 csv <- read_csv(file = "raw-data/xian_data.csv",
-                skip = 3) %>% 
-  clean_names() %>%
-  mutate_at(vars(eval_gov_overall, eval_gov_demo, eval_gov_traffic), 
-            na_if,
-            "undefined") 
+                skip = 3,
+                na = c("", "undefined")) %>% 
+  clean_names()
   
 # I used gt(), as in 2/13 class, for a nice presentation of the data and to
 # label the columns with their actual metric descriptors (which I found from
-# looking at the research on Harvard HOLLIS).
-# I 
+# looking at the research on Harvard HOLLIS)
   
 csv %>%
   gt() %>%
@@ -81,14 +75,13 @@ r1 <- csv %>%
 # I call mean() to find the average (overall) government rating, filtering for
 # responses from the treatment group only
 
-##FIX THIS##
-
 r2 <- csv %>%
   filter(treatment == 1) %>% 
   summarize(mean(eval_gov_overall, na.rm = TRUE))
 ```
 
-2. Among respondents from the treatment group, the government has an average `r r2` rating.
+2. Among respondents from the treatment group, the government has an average 
+`r r2` rating.
 
 
 ```{r Mad Libs 3, include=FALSE}
@@ -112,14 +105,17 @@ r3 <- names(temp)[temp == max(temp)]
 
 ```{r Mad Libs 4, include=FALSE}
 
-# 
+# Filter first through values of THREE columns, before counting the desired rows
+# to get the appropriate number of respondents. I'm assuming the statement is an
+# "and/or" statement that selects respondents who gave 1, 2, or 3 ratings of 10.
 
 r4 <- csv %>%
   filter(eval_gov_overall == 10 | eval_gov_demo == 10 | eval_gov_traffic == 10) %>% 
   count()
 ```
 
-4. `r r4` respondents have given the government a 10 rating overall or on demolitions or on traffic.
+4. `r r4` respondents have given the government a 10 rating overall or on 
+demolitions or on traffic.
 
 
 ```{r Mad Libs 5, include=FALSE}
@@ -132,19 +128,121 @@ r5 <- csv %>%
   count()
 ```
 
-5. But only `r r5` gave the government a 10 rating overall and on demolitions and on traffic.
+5. But only `r r5` gave the government a 10 rating overall and on demolitions 
+and on traffic.
 
 
-The variable ‘news_source’ asks respondents to list which news sources they get their news from. Some respondents answered more than one option, so their answer lists a number of letters together. A means “Television”, B means “Newspapers”, C means “Radio”, etc
+The variable ‘news_source’ asks respondents to list which news sources they 
+get their news from. Some respondents answered more than one option, so their 
+answer lists a number of letters together. A means “Television”, B means 
+“Newspapers”, C means “Radio”, etc
+
+```{r Mad Libs 6, include=FALSE}
+
+# We're interested in (pure) Television viewers so we simply filter for A in 
+# the news_source column
+
+r6 <- csv %>%
+  filter(news_source == "A") %>% 
+  count()
+```
+
+6. The number of respondents who get their news from Television is `r r6`.
 
 
-6. The number of respondents who get their news from Television is X
+```{r Mad Libs 7, include=FALSE}
 
+library(stringr)
 
-7. Of the 4 different locations where the respondents were surveyed, the following two locations end with “square”: X,X
+# 
+
+r7 <- csv %>% 
+  filter(str_detect(location, "square")) %>% 
+  count(location) %>% 
+  select(location) %>% 
+  slice(1)
+
+r8 <- csv %>% 
+  filter(str_detect(location, "square")) %>% 
+  count(location) %>% 
+  select(location) %>% 
+  slice(2)
+```
+
+7. Of the 4 different locations where the respondents were surveyed, the 
+following two locations end with “square”: `r r7`, `r r8`.
 
 
 ## Data Wrangling
+
+### 1. 
+
+```{r data 2}
+
+library(tidyr)
+
+#
+
+untidy <- read_csv(file = "raw-data/xian_data.csv",
+                skip = 3,
+                na = c("", "undefined")) %>% 
+  clean_names() %>% 
+  select(respondent, eval_gov_overall, eval_gov_traffic, eval_gov_demo) %>% 
+  slice(1:10)
+
+# 
+  
+untidy %>%
+  gt() %>%
+    tab_header(title = "Untidy Data") %>%
+    tab_spanner(label = "Evaluations of Government Performance",
+                columns = vars(
+                  eval_gov_overall, 
+                  eval_gov_demo, 
+                  eval_gov_traffic
+                )
+    ) %>% 
+    cols_label(
+      respondent = "Respondent Number",
+      eval_gov_overall = "Overall",
+      eval_gov_demo = "Demolitions",
+      eval_gov_traffic = "Traffic"
+    ) %>% 
+    cols_move_to_end(columns = vars(eval_gov_demo))
+
+#
+
+tidy <- untidy %>% 
+  pivot_longer(
+    names_to = "Type of Evaluation",
+    values_to = "Performance Rating",
+    cols = c(eval_gov_overall, eval_gov_traffic, eval_gov_demo)
+  )
+
+tidy %>% 
+  gt() %>% 
+    tab_spanner(label = "Tidy Data",
+                columns = vars(
+                  respondent, 
+                  "Type of Evaluation", 
+                  "Performance Rating"
+                )
+    ) %>% 
+    cols_label(respondent = "Respondent Number")
+    
+```
+
+
+### 2.
+
+
+
+
+### 3.
+
+
+### 4.
+
 
 
 
