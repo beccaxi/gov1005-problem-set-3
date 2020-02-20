@@ -280,7 +280,7 @@ outcomes %>%
 
 ```{r data 3, echo=FALSE, message=FALSE}
 
-# inner_join demographics to demographics?
+#
 
 load("r-data/demographics.Rdata")
 
@@ -320,15 +320,41 @@ joined %>%
 
 #
 
+joined$education <- fct_relevel(
+  joined$education, 
+  "Primary", 
+  "Incomplete secondary", 
+  "Complete secondary", 
+  "Some university"
+)
+
+#
+
 plot <- joined %>% 
+  na.omit() %>% 
+  mutate(treatment = factor(treatment)) %>% 
   select(respondent, education, treatment, control, eval_gov_overall) %>% 
   group_by(education, treatment, control) %>% 
-  summarize(avg = mean(as.numeric(eval_gov_overall), na.rm = TRUE)) %>% 
-  na.omit()
+  summarize(avg = mean(as.numeric(eval_gov_overall), na.rm = TRUE)) 
+
+#
 
 plot %>% 
-  ggplot(aes(x = education, y = avg), fill = treatment) +
-    geom_point()
+  ggplot(aes(x = education, y = avg, color = treatment)) +
+    geom_point() +
+    theme(
+      panel.background = element_rect(fill = "white"),
+      axis.line = element_line(size = 0.5, color = "black"),
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "top",
+      legend.key = element_rect(fill = "transparent")
+    ) +
+    labs(
+      title = "Government Performance Evaluations \n By Treatment Group \n and Education Level",
+      x = "Education",
+      y = "Average Evaluation",
+      color = "Viewed Sports Video"
+    ) 
 
 ```
 
@@ -337,7 +363,30 @@ plot %>%
 
 ```{r data 5, echo=FALSE, message=FALSE}
 
+# The rvest package allows us to work with XML and specifically HTML documents
+
+library(rvest)
+
+# We read the source html of the Wikipedia page and store it in h
+
+h <- read_html("https://en.wikipedia.org/wiki/2008_Summer_Olympics#Medal_table")
+
+# We know we're looking for a table, so we feed the results of html_nodes() 
+# into tab and convert the HTML tables into data frames for much easier viewing 
+# and handling later on.
+
+tab <- h %>% 
+  html_nodes("table") %>% 
+  html_table(fill = TRUE) 
+
+# When we view the contents of tab, we notice that the 
+# one we're interested in (country gold medals) is [] in the list of data 
+# frames, so we extract that one.
+
+tab <- tab[[8]]
+  
 #
+
 
 
 
@@ -359,5 +408,6 @@ plot %>%
 
 * Sophie Webster
 
+* Lainey Newman
 
 
