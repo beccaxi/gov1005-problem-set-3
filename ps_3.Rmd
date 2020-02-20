@@ -147,11 +147,11 @@ answer lists a number of letters together. A means “Television”, B means
 
 ```{r Mad Libs 6, include=FALSE}
 
-# We're interested in (pure) Television viewers, so we simply filter for A in 
-# the news_source column
+# We're interested in (pure) Television viewers, so we filter for all
+# observations containing "A" in the news_source column using str_detect
 
 r6 <- csv %>%
-  filter(news_source == "A") %>% 
+  filter(str_detect(news_source, "A")) %>% 
   count()
 ```
 
@@ -159,10 +159,6 @@ r6 <- csv %>%
 
 
 ```{r Mad Libs 7, include=FALSE}
-
-# We have to download the stringr package to use str_detect later on
-
-library(stringr)
 
 # I find the two town names separately in order to accommodate the comma
 # separating the two names in the written text. For each one, I filter the csv
@@ -473,6 +469,8 @@ ggplot(gold, aes(x = reorder(Nation, -Gold), y = Gold)) +
 * Lainey Newman
 
 * Jacob Hansen
+
+* Jack Kelly
 
 
 
