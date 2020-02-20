@@ -367,29 +367,36 @@ plot %>%
 
 library(rvest)
 
-# We read the source html of the Wikipedia page and store it in h
+# We read the source html of the Wikipedia page and store it in h. We know we're
+# looking for a table, so we feed the results of html_nodes() into tab and 
+# convert the HTML tables into data frames for much easier viewing and handling 
+# later on. When we view the contents of tab, we notice that the one we're 
+# interested in (country gold medals) is [] in the list of data frames, so we 
+# extract that one.
 
 h <- read_html("https://en.wikipedia.org/wiki/2008_Summer_Olympics#Medal_table")
-
-# We know we're looking for a table, so we feed the results of html_nodes() 
-# into tab and convert the HTML tables into data frames for much easier viewing 
-# and handling later on.
-
 tab <- h %>% 
   html_nodes("table") %>% 
   html_table(fill = TRUE) 
-
-# When we view the contents of tab, we notice that the 
-# one we're interested in (country gold medals) is [] in the list of data 
-# frames, so we extract that one.
-
-tab <- tab[[8]]
+gold <- tab[[8]]
   
 #
 
+gold <- gold %>% 
+  select(Nation, Gold) %>% 
+  filter(Gold < 100)
 
+# 
 
-
+ggplot(gold, aes(x = reorder(Nation, -Gold), y = Gold)) +
+  geom_col() +
+  theme(
+      panel.background = element_rect(fill = "white"),
+      axis.line = element_line(size = 0.5, color = "black")
+  ) +
+  labs(title = "Number of Gold Medals in 2008 Beijing Olympics",
+       x = "Country",
+       y = "Gold Medals")
 ```
 
 
@@ -409,5 +416,8 @@ tab <- tab[[8]]
 * Sophie Webster
 
 * Lainey Newman
+
+* Jacob Hansen
+
 
 
