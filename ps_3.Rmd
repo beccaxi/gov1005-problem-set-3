@@ -21,8 +21,8 @@ library(tidyverse)
 ```{r data, include=FALSE}
 
 # As in 2/13 class, I set skip = 3 and moved the descriptive information
-# (authors) for the dataset in those lines into a subtitle for a cleaner look. 
-# I used the argument na within read_csv() to replace all missing and undefined
+# (authors) for the dataset in those lines into a subtitle for a cleaner look. I
+# used the argument na within read_csv() to replace all missing and undefined
 # values with NA before using clean_names() from the janitor library.
 
 csv <- read_csv(file = "raw-data/xian_data.csv",
@@ -30,9 +30,9 @@ csv <- read_csv(file = "raw-data/xian_data.csv",
                 na = c("", "undefined")) %>% 
   clean_names()
   
-# I used gt(), as in 2/13 class, for a nice presentation of the data and to
-# label the columns with their actual metric descriptors (which I found from
-# looking at the research on Harvard HOLLIS)
+#I used gt(), as in 2/13 class, for a nice presentation of the data and to label
+#the columns with their actual metric descriptors (which I found from looking at
+#the research on Harvard HOLLIS), as well as add the required title and subtitle
   
 csv %>%
   gt() %>%
@@ -59,9 +59,9 @@ csv %>%
 
 ```{r Mad Libs 1, include=FALSE}
 
-# I call sum() to aggregate the values of the column "treatment", which 
-# returns the number of respondents in the Treatment group since each such 
-# respondent corresponds to a value of 1
+# I call sum() to aggregate the values of the column "treatment", which returns
+# the number of respondents in the Treatment group. This makes sense for our
+# purposes since each such respondent corresponds to a value of 1.
 
 r1 <- csv %>%
   summarize(sum(treatment))
@@ -89,7 +89,7 @@ r2 <- csv %>%
 # This line creates a table called "temp", where the first row is a sorted list
 # of all unique values in the argument (csv$eval_gov_traffic). The second row in
 # temp counts how many occurrences of each value. So this method is a nice way
-# of finding the mode of a column, since a mode() function doesn't exist
+# of finding the mode of a column, since a direct mode() function doesn't exist
 # directly.
 
 temp <- table(as.vector(csv$eval_gov_traffic))
@@ -110,7 +110,11 @@ r3 <- names(temp)[temp == max(temp)]
 # "and/or" statement that selects respondents who gave 1, 2, or 3 ratings of 10.
 
 r4 <- csv %>%
-  filter(eval_gov_overall == 10 | eval_gov_demo == 10 | eval_gov_traffic == 10) %>% 
+  filter(
+    eval_gov_overall == 10 | 
+    eval_gov_demo == 10 | 
+    eval_gov_traffic == 10
+  ) %>% 
   count()
 ```
 
@@ -120,11 +124,15 @@ demolitions or on traffic.
 
 ```{r Mad Libs 5, include=FALSE}
 
-# Just like in the last one, except switch out the "or" indicators for "and"
-# indicators before counting the filtered rows
+# This is just like the previous Mad Libs, except here we switch out the "or"
+# indicators for "and" indicators before counting the filtered rows
 
 r5 <- csv %>%
-  filter(eval_gov_overall == 10 & eval_gov_demo == 10 & eval_gov_traffic == 10) %>% 
+  filter(
+    eval_gov_overall == 10 & 
+    eval_gov_demo == 10 & 
+    eval_gov_traffic == 10
+  ) %>% 
   count()
 ```
 
@@ -135,11 +143,11 @@ and on traffic.
 The variable ‘news_source’ asks respondents to list which news sources they 
 get their news from. Some respondents answered more than one option, so their 
 answer lists a number of letters together. A means “Television”, B means 
-“Newspapers”, C means “Radio”, etc
+“Newspapers”, C means “Radio”, etc.
 
 ```{r Mad Libs 6, include=FALSE}
 
-# We're interested in (pure) Television viewers so we simply filter for A in 
+# We're interested in (pure) Television viewers, so we simply filter for A in 
 # the news_source column
 
 r6 <- csv %>%
@@ -152,9 +160,15 @@ r6 <- csv %>%
 
 ```{r Mad Libs 7, include=FALSE}
 
+# We have to download the stringr package to use str_detect later on
+
 library(stringr)
 
-# 
+# I find the two town names separately in order to accommodate the comma
+# separating the two names in the written text. For each one, I filter the csv
+# for locations containing "square" before counting and selecting those
+# locations. I call slice(1) for the first town name and slice(2) for the
+# second.
 
 r7 <- csv %>% 
   filter(str_detect(location, "square")) %>% 
@@ -177,20 +191,25 @@ following two locations end with “square”: `r r7`, `r r8`.
 
 ### 1. 
 
-```{r data 1, echo=FALSE, message=FALSE, warning=FALSE}
+```{r data 1, echo=FALSE, message=FALSE}
 
 library(tidyr)
 
-#
+# After reading in the file and replacing any missing or "undefined" values with
+# NA, I use the janitor package to clean names (as in class) and select the
+# columns I want to work with later. I then slice to get just the top ten
+# responses. 
 
 untidy <- read_csv(file = "raw-data/xian_data.csv",
-                skip = 3,
-                na = c("", "undefined")) %>% 
+                   skip = 3,
+                   na = c("", "undefined")) %>% 
   clean_names() %>% 
   select(respondent, eval_gov_overall, eval_gov_traffic, eval_gov_demo) %>% 
   slice(1:10)
 
-# 
+# Here I plot untidy using gt() in order to neatly format the titles and labels,
+# as well as rearrange the columns. This was pretty straightforward (again, very
+# reminiscent of class).
   
 untidy %>%
   gt() %>%
@@ -210,7 +229,10 @@ untidy %>%
     ) %>% 
     cols_move_to_end(columns = vars(eval_gov_demo))
 
-#
+# Now I move on to tidy my dataset (hence the name "title"). I rename my three
+# evaluation columns before pivoting to allow for simpler formatting and also so
+# the new titles will show up immediately on the table. After pivoting, I use
+# gt() again for some simple formatting.
 
 tidy <- untidy %>% 
   rename(
@@ -228,7 +250,6 @@ tidy %>%
   gt() %>% 
     tab_header(title = "Tidy Data") %>% 
     cols_label(respondent = "Respondent Number")
-    
 ```
 
 
@@ -236,16 +257,25 @@ tidy %>%
 
 ```{r data 2, echo=FALSE, message=FALSE}
 
-# Let's re-read the file in to start on a clean slate, assigning it to
-# "outcomes" now
+# Let's re-read the file in to start on a clean slate, assigning it now to
+# "outcomes" and cleaning and slicing for the top ten responses again just as
+# before
 
 outcomes <- read_csv(file = "raw-data/xian_data.csv",
-                skip = 3,
-                na = c("", "undefined")) %>% 
+                     skip = 3,
+                     na = c("", "undefined")) %>% 
   clean_names() %>% 
   slice(1:10)
 
-# This is to change the treatment and control columns into 
+# I use mutate() to create two new columns, under_control and under_treatment,
+# which will eventually show up in the table as Under Control and Under
+# Treatment. I use ifelse to sort rows (observations) into these two columns
+# based on whether treatment equals 0 (indicating a member of the control group)
+# or 1 (indicating a member of the treatment group), sorting data from
+# eval_gov_overall and inserting "?" into the each column when the
+# eval_gov_overall entry is sorted into the other column based on the result of
+# ifelse. I then use gt() to actually create and format the table, as well as
+# add a footnote - this is pretty straightforward.
   
 outcomes %>% 
   mutate(
@@ -268,10 +298,10 @@ outcomes %>%
       under_treatment = "Under Treatment",
       under_control = "Under Control"
     ) %>% 
-  cols_align(align = c("center"), columns = TRUE) %>% 
-  tab_footnote(
-    footnote = "Treatment is a 2 minute video about Chinese sports performance",
-    locations = cells_title("title")
+    cols_align(align = c("center"), columns = TRUE) %>% 
+    tab_footnote(
+      footnote = "Treatment is a 2 minute video about Chinese sports performance",
+      locations = cells_title("title")
   )
 ```
 
@@ -280,16 +310,21 @@ outcomes %>%
 
 ```{r data 3, echo=FALSE, message=FALSE}
 
-#
+# I have to load the file in first, of course
 
 load("r-data/demographics.Rdata")
 
-#
+# I then use full_join to join all columns of the csv (from the previous part)
+# and the new file, which is titled "demographics". I want to join by respondent
+# to match all respondents with their corresponding pieces of information.
 
 joined <- csv %>% 
   full_join(demographics, by = "respondent")
 
-#
+# I filter for respondents in the treatment group, arrange in descending order
+# of (traffic) evaluation, select the relevant columns, slice for the top 5
+# respondents only, and use gt() to create and format the table. As before, I
+# add a footnote attached to the title of the table.
   
 joined %>% 
   filter(treatment == 1) %>% 
@@ -318,7 +353,9 @@ joined %>%
 
 ```{r data 4, echo=FALSE, message=FALSE}
 
-#
+# Before doing anything else, I reorder the elements of the Education column
+# using fct_relevel so that they're ordered chronologically by the time I get to
+# plotting
 
 joined$education <- fct_relevel(
   joined$education, 
@@ -328,7 +365,14 @@ joined$education <- fct_relevel(
   "Some university"
 )
 
-#
+# Here I prepare my dataset for plotting. I apply na.omit() before anything else
+# to conveniently eliminate all NA's before dealing with the rest of the data
+# (problems arose when I tried to apply na.omit() later rather than here). I
+# have to change treatment into a factor so that it appears on the legend as
+# simply 0 and 1, rather than a scale from 0 to 1, when plotting. I then select
+# the relevant columns, group by all but eval_gov_overall (it wouldn't make
+# sense to group by eval_gov_overall), and then find the averages of
+# eval_gov_overall for each of the just-defined groups.
 
 plot <- joined %>% 
   na.omit() %>% 
@@ -337,7 +381,9 @@ plot <- joined %>%
   group_by(education, treatment, control) %>% 
   summarize(avg = mean(as.numeric(eval_gov_overall), na.rm = TRUE)) 
 
-#
+# Here I finally plot the dataset using geom_point(), taking care to format the
+# x-axis labels, title, and legend correctly (this was nitpicky and took me a
+# while to just find the right syntax)
 
 plot %>% 
   ggplot(aes(x = education, y = avg, color = treatment)) +
@@ -355,7 +401,6 @@ plot %>%
       y = "Average Evaluation",
       color = "Viewed Sports Video"
     ) 
-
 ```
 
 
@@ -380,13 +425,21 @@ tab <- h %>%
   html_table(fill = TRUE) 
 gold <- tab[[8]]
   
-#
+# It isn't strictly necessary to select for Nation and Gold, but I do it anyway
+# because why not. It is important, though, to filter for values of Gold that
+# are less than 100 in order to easily eliminate the Total number of gold medals
+# across all ten nations.
 
 gold <- gold %>% 
   select(Nation, Gold) %>% 
   filter(Gold < 100)
 
-# 
+# Here I finally plot the dataset "gold" that I've created. I copy-pasted the
+# background and axis formatting from the previous part and used labs() to
+# relabel the title and columns. One tricky thing was figuring out how to
+# reorder the x-elements by the sum of the y-elements, which I eventually
+# accomplished using x = reorder(value, -count). The negative sign in front of
+# Gold is necessary in order to sort in descending order.
 
 ggplot(gold, aes(x = reorder(Nation, -Gold), y = Gold)) +
   geom_col() +
@@ -394,9 +447,11 @@ ggplot(gold, aes(x = reorder(Nation, -Gold), y = Gold)) +
       panel.background = element_rect(fill = "white"),
       axis.line = element_line(size = 0.5, color = "black")
   ) +
-  labs(title = "Number of Gold Medals in 2008 Beijing Olympics",
-       x = "Country",
-       y = "Gold Medals")
+  labs(
+    title = "Number of Gold Medals in 2008 Beijing Olympics",
+    x = "Country",
+    y = "Gold Medals"
+  )
 ```
 
 
